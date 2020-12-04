@@ -6,6 +6,7 @@ import os
 import random
 import shutil
 from collections import defaultdict
+import spacy
 
 
 def get_file_list_from_path(path, name='', extension='.txt'):
@@ -30,6 +31,20 @@ def get_file_list_from_path(path, name='', extension='.txt'):
                 file_list.append(filename)
     # print(file_list)
     return file_list
+
+
+def get_subdir_list_from_path(dirpath):
+    """
+    Get the names of the immediate subdirectories in the given path.
+    Return a list of subdirectory names.
+    Source: https://stackoverflow.com/a/40347279
+
+    :param path: str
+    :return: list
+    """
+    subdir_list = [f.path.split('/')[-1] for f in os.scandir(dirpath) if f.is_dir()]
+    # print('SUBDIR_LIST:', len(subdir_list), subdir_list[:10])
+    return subdir_list
 
 
 def file_lines_to_list(file_path):
@@ -148,10 +163,10 @@ def copy_files_from_list(file_list, destination_path):
     print('Number of files copied:', counter)
 
 
-def remove_existing_file_names(file_list, path):
+def remove_existing_file_names(file_list, dir_path):
     """
     From the given file_list, remove all the file names
-    that exist in the given path's folder.
+    that exist in the given dir_path.
     Return a new list of non-existing file names.
 
     :param file_list: list of str
@@ -161,7 +176,7 @@ def remove_existing_file_names(file_list, path):
     
     # Get names with whole path of the already existing files
     existing_files_dict = defaultdict()
-    existing_files_list = get_file_list_from_path(path, name='', extension='')
+    existing_files_list = get_file_list_from_path(dir_path, name='', extension='')
     # print('EXISTING:', existing_files_list[:10])
 
     downloads = 0
@@ -195,6 +210,13 @@ def remove_existing_file_names(file_list, path):
     return non_existing_files_list
 
 
+def json2dict(file_name):
+    # print(file_name)
+    with open(file_name, 'r') as f:
+        # pprint(json.load(f))
+        return json.load(f)
+
+
 def to_json_output_file(file_name, data):
     """
     Print the given data input to 
@@ -205,14 +227,14 @@ def to_json_output_file(file_name, data):
     :return: text file
     """
     with open(file_name, 'w') as outfile:
-        json.dump(data, outfile)
-        print(json.dumps(data))
+        # print('JSON_DUMPS:', json.dumps(data))
+        json.dump(data, outfile, indent=4)
 
 
 def print_list_to_file(outfile_name, list):
     """
     Create a file with the given outfile_name
-    and print the file paths in the given list
+    and print each element in the given list
     on a new line of the new file.
     Last line not followed by newline.
 
@@ -221,8 +243,8 @@ def print_list_to_file(outfile_name, list):
     :return: None
     """
     with open(outfile_name, 'w') as outfile:
-        for file_name in list[:-1]:
-            outfile.write('{name}{newline}'.format(name=file_name, newline='\n'))
+        for elt in list[:-1]:
+            outfile.write('{name}{newline}'.format(name=elt, newline='\n'))
             # outfile.write("%s\n" % file_name)
 
         # Last line not followed by newline
