@@ -1,8 +1,10 @@
-# EU CELLAR Corpus Compiler
+# EU Regulation Corpus Compiler
 
-Programs to retrieve CELLAR records from EU Sparql endpoint and download the corresponding `.xml` and `.html` files from the EU CELLAR endpoint.
+Programs to retrieve EU regulatory documents from the Eur-Lex portal (https://eur-lex.europa.eu). 
 
-The program checks whether the files have already been downloaded so as to download only new files.
+The program uses a given SPARQL query to retrieve CELLAR records from the EU Sparql endpoint and download the corresponding `.xml` and `.html` files from the EU CELLAR endpoint.
+
+The program also checks whether the files have already been downloaded so as to download only new files.
 
 ## Usage
 
@@ -10,7 +12,7 @@ Run `get_cellar_docs.py` to send the SPARQL query to EU Sparql endpoint and down
 
 ## SPARQL query
 
-The SPARQL query in the `sparql_queries` directory was designed to retrieve EU regulatory documents in the financial domain using EuroVoc concept ids. It can be used as a template to create new queries for other domains, langages, types of documents, etc.
+The SPARQL query in the `sparql_queries/` directory was designed to retrieve EU regulatory documents in the financial domain using EuroVoc concept ids. It can be used as a template to create new queries for other domains, langages, types of documents, etc.
 
 ## Author
 Selja Seppälä
