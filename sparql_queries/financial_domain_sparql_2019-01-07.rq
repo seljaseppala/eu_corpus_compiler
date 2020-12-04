@@ -1,0 +1,289 @@
+PREFIX cdm:<http://publications.europa.eu/ontology/cdm#>
+PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
+PREFIX dc:<http://purl.org/dc/elements/1.1/>
+PREFIX xsd:<http://www.w3.org/2001/XMLSchema#>
+PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:<http://www.w3.org/2002/07/owl#>
+
+SELECT 
+DISTINCT
+(GROUP_CONCAT(distinct ?work;separator="|") as ?cellarURIs)
+(GROUP_CONCAT(distinct ?langIdentifier;separator="|") as ?lang)
+(GROUP_CONCAT(distinct ?mtype;separator="|") as ?mtypes)
+(GROUP_CONCAT(distinct ?resType;separator="|") as ?workTypes)
+(GROUP_CONCAT(distinct ?subjectLabel;separator="|") as ?subjects)
+(GROUP_CONCAT(distinct ?subject;separator="|") as ?subject_ids)
+
+WHERE 
+{
+	graph ?g {
+		#?work rdf:type cdm:legislation_secondary .
+		?work rdf:type ?resType .
+		FILTER(  ?resType = cdm:act_preparatory || ?resType = cdm:decision_delegated || ?resType = cdm:decision_implementing || ?resType = cdm:decision || ?resType = cdm:directive || ?resType = cdm:guideline_ecb || ?resType = cdm:regulation_delegated || ?resType = cdm:regulation_implementing || ?resType = cdm:regulation )
+				?work cdm:work_is_about_concept_eurovoc ?subject . 
+	graph ?ga { 
+		?subject skos:prefLabel ?subjectLabel .
+		FILTER (lang(?subjectLabel)="en") }
+		FILTER( ?subject = <http://eurovoc.europa.eu/1016>  #	international finance
+				|| ?subject = <http://eurovoc.europa.eu/1918>  #	clearing agreement
+				|| ?subject = <http://eurovoc.europa.eu/2219>  #	international payment
+				|| ?subject = <http://eurovoc.europa.eu/300>   #	international credit
+				|| ?subject = <http://eurovoc.europa.eu/3186>  #	financial agreement
+				|| ?subject = <http://eurovoc.europa.eu/587>   #	special drawing rights
+				|| ?subject = <http://eurovoc.europa.eu/4603>  #	European Payments Union
+				|| ?subject = <http://eurovoc.europa.eu/6151>  #	euro area
+				|| ?subject = <http://eurovoc.europa.eu/6334>  #	Euribor
+				|| ?subject = <http://eurovoc.europa.eu/1676>  #	money-market liquidity
+				|| ?subject = <http://eurovoc.europa.eu/1809>  #	money market
+				|| ?subject = <http://eurovoc.europa.eu/1825>  #	money supply
+				|| ?subject = <http://eurovoc.europa.eu/1969>  #	money
+				|| ?subject = <http://eurovoc.europa.eu/1972>  #	paper money
+				|| ?subject = <http://eurovoc.europa.eu/1974>  #	national currency
+				|| ?subject = <http://eurovoc.europa.eu/1975>  #	deposit money
+				|| ?subject = <http://eurovoc.europa.eu/2365>  #	petrodollar
+				|| ?subject = <http://eurovoc.europa.eu/3220>  #	private-sector liquidity
+				|| ?subject = <http://eurovoc.europa.eu/4463>  #	negotiable instrument
+				|| ?subject = <http://eurovoc.europa.eu/4731>  #	credit transfer
+				|| ?subject = <http://eurovoc.europa.eu/5963>  #	cheque
+				|| ?subject = <http://eurovoc.europa.eu/903>   #	Eurobond
+				|| ?subject = <http://eurovoc.europa.eu/904>   #	Euromarket
+				|| ?subject = <http://eurovoc.europa.eu/1799>  #	foreign exchange market
+				|| ?subject = <http://eurovoc.europa.eu/2240>  #	exchange parity
+				|| ?subject = <http://eurovoc.europa.eu/433>   #	foreign currency
+				|| ?subject = <http://eurovoc.europa.eu/4390>  #	exchange rate
+				|| ?subject = <http://eurovoc.europa.eu/4393>  #	floating rate
+				|| ?subject = <http://eurovoc.europa.eu/6335>  #	conversion rate
+				|| ?subject = <http://eurovoc.europa.eu/178>   #	liquidity control
+				|| ?subject = <http://eurovoc.europa.eu/4763>  #	central bank
+				|| ?subject = <http://eurovoc.europa.eu/4602>  #	Economic and Monetary Union
+				|| ?subject = <http://eurovoc.europa.eu/5883> #	European System of Central Banks
+				|| ?subject = <http://eurovoc.europa.eu/5917>  #	multilateral surveillance
+				|| ?subject = <http://eurovoc.europa.eu/1452>  #	financial institution
+				|| ?subject = <http://eurovoc.europa.eu/230>   #	credit union
+				|| ?subject = <http://eurovoc.europa.eu/3246>  #	credit institution
+				|| ?subject = <http://eurovoc.europa.eu/3247>  #	finance house
+				|| ?subject = <http://eurovoc.europa.eu/4118> #	post office financial services
+				|| ?subject = <http://eurovoc.europa.eu/4738>  #	bank
+				|| ?subject = <http://eurovoc.europa.eu/4752>  #	agricultural bank
+				|| ?subject = <http://eurovoc.europa.eu/4774>  #	commercial bank
+				|| ?subject = <http://eurovoc.europa.eu/4784>  #	cooperative bank
+				|| ?subject = <http://eurovoc.europa.eu/4795>  #	investment bank
+				|| ?subject = <http://eurovoc.europa.eu/4806>  #	development bank
+				|| ?subject = <http://eurovoc.europa.eu/4813>  #	people's bank
+				|| ?subject = <http://eurovoc.europa.eu/4814>  #	private bank
+				|| ?subject = <http://eurovoc.europa.eu/4815>  #	public bank
+				|| ?subject = <http://eurovoc.europa.eu/5089>  #	savings bank
+				|| ?subject = <http://eurovoc.europa.eu/5090>  #	mortgage bank
+				|| ?subject = <http://eurovoc.europa.eu/872>   #	special-status institution
+				|| ?subject = <http://eurovoc.europa.eu/2149>  #	banking
+				|| ?subject = <http://eurovoc.europa.eu/2151>  #	exchange transaction
+				|| ?subject = <http://eurovoc.europa.eu/2371>  #	arbitrage
+				|| ?subject = <http://eurovoc.europa.eu/2447>  #	banking policy
+				|| ?subject = <http://eurovoc.europa.eu/3248>  #	electronic banking
+				|| ?subject = <http://eurovoc.europa.eu/3251>  #	banking supervision
+				|| ?subject = <http://eurovoc.europa.eu/3252>  #	bank charges
+				|| ?subject = <http://eurovoc.europa.eu/3612>  #	banking profession
+				|| ?subject = <http://eurovoc.europa.eu/3994>  #	banking secrecy
+				|| ?subject = <http://eurovoc.europa.eu/408>   #	bank deposit
+				|| ?subject = <http://eurovoc.europa.eu/4356>  #	banking system
+				|| ?subject = <http://eurovoc.europa.eu/521>   #	law of banking
+				|| ?subject = <http://eurovoc.europa.eu/1130>  #	credit guarantee
+				|| ?subject = <http://eurovoc.europa.eu/1476>  #	interest
+				|| ?subject = <http://eurovoc.europa.eu/2495>  #	credit policy
+				|| ?subject = <http://eurovoc.europa.eu/278>   #	cost of borrowing
+				|| ?subject = <http://eurovoc.europa.eu/2959>  #	rediscounting
+				|| ?subject = <http://eurovoc.europa.eu/3230>  #	discount rate
+				|| ?subject = <http://eurovoc.europa.eu/3231>  #	credit control
+				|| ?subject = <http://eurovoc.europa.eu/5023>  #	interest rate subsidy
+				|| ?subject = <http://eurovoc.europa.eu/858>   #	discounting
+				|| ?subject = <http://eurovoc.europa.eu/2606>  #	loan
+				|| ?subject = <http://eurovoc.europa.eu/285>   #	credit
+				|| ?subject = <http://eurovoc.europa.eu/286>   #	short-term credit
+				|| ?subject = <http://eurovoc.europa.eu/289>   #	consumer credit
+				|| ?subject = <http://eurovoc.europa.eu/290>   #	long-term credit
+				|| ?subject = <http://eurovoc.europa.eu/292>   #	medium-term credit
+				|| ?subject = <http://eurovoc.europa.eu/293>   #	trade credit
+				|| ?subject = <http://eurovoc.europa.eu/295>   #	investment loan
+				|| ?subject = <http://eurovoc.europa.eu/297>   #	documentary credit
+				|| ?subject = <http://eurovoc.europa.eu/298>   #	real estate credit
+				|| ?subject = <http://eurovoc.europa.eu/3229>  #	free credit
+				|| ?subject = <http://eurovoc.europa.eu/3263>  #	redemption
+				|| ?subject = <http://eurovoc.europa.eu/6339>  #	agricultural credit
+				|| ?subject = <http://eurovoc.europa.eu/6713>  #	microloan
+				|| ?subject = <http://eurovoc.europa.eu/736>   #	borrowing
+				|| ?subject = <http://eurovoc.europa.eu/742>   #	indebtedness
+				|| ?subject = <http://eurovoc.europa.eu/8432>  #	civil bankruptcy
+				|| ?subject = <http://eurovoc.europa.eu/8469>  #	financial services
+				|| ?subject = <http://eurovoc.europa.eu/1630>  #	free movement of capital
+				|| ?subject = <http://eurovoc.europa.eu/2002>  #	capital movement
+				|| ?subject = <http://eurovoc.europa.eu/2386>  #	investment transaction
+				|| ?subject = <http://eurovoc.europa.eu/2502>  #	financial policy
+				|| ?subject = <http://eurovoc.europa.eu/2890>  #	repatriation of capital
+				|| ?subject = <http://eurovoc.europa.eu/2946>  #	recycling of capital
+				|| ?subject = <http://eurovoc.europa.eu/3235>  #	outflow of capital
+				|| ?subject = <http://eurovoc.europa.eu/3236>  #	transfer pricing
+				|| ?subject = <http://eurovoc.europa.eu/4493>  #	capital transfer
+				|| ?subject = <http://eurovoc.europa.eu/4749>  #	trading volume
+				|| ?subject = <http://eurovoc.europa.eu/5153>  #	speculative capital
+				|| ?subject = <http://eurovoc.europa.eu/5156>  #	capital market
+				|| ?subject = <http://eurovoc.europa.eu/5157>  #	venture capital
+				|| ?subject = <http://eurovoc.europa.eu/5240>  #	foreign capital
+				|| ?subject = <http://eurovoc.europa.eu/5465>  #	money laundering
+				|| ?subject = <http://eurovoc.europa.eu/560>   #	financial legislation
+				|| ?subject = <http://eurovoc.europa.eu/947>   #	export of capital
+				|| ?subject = <http://eurovoc.europa.eu/1459>  #	financial instrument
+				|| ?subject = <http://eurovoc.europa.eu/1485>  #	financial intervention
+				|| ?subject = <http://eurovoc.europa.eu/1790>  #	spot market
+				|| ?subject = <http://eurovoc.europa.eu/1804>  #	financial market
+				|| ?subject = <http://eurovoc.europa.eu/2098>  #	bond
+				|| ?subject = <http://eurovoc.europa.eu/2150>  #	stock-exchange transaction
+				|| ?subject = <http://eurovoc.europa.eu/248>   #	stock-exchange listing
+				|| ?subject = <http://eurovoc.europa.eu/262>   #	price of securities
+				|| ?subject = <http://eurovoc.europa.eu/2787>  #	financial occupation
+				|| ?subject = <http://eurovoc.europa.eu/3233>  #	stock exchange
+				|| ?subject = <http://eurovoc.europa.eu/4187>  #	financial situation
+				|| ?subject = <http://eurovoc.europa.eu/4263>  #	financial statistics
+				|| ?subject = <http://eurovoc.europa.eu/4491>  #	financial transaction
+				|| ?subject = <http://eurovoc.europa.eu/4642>  #	market capitalisation
+				|| ?subject = <http://eurovoc.europa.eu/4646>  #	securities
+				|| ?subject = <http://eurovoc.europa.eu/5362>  #	share
+				|| ?subject = <http://eurovoc.europa.eu/728>   #	issue of securities
+				|| ?subject = <http://eurovoc.europa.eu/1000>  #	financing
+				|| ?subject = <http://eurovoc.europa.eu/1001>  #	short-term financing
+				|| ?subject = <http://eurovoc.europa.eu/1002>  #	long-term financing
+				|| ?subject = <http://eurovoc.europa.eu/1003>  #	medium-term financing
+				|| ?subject = <http://eurovoc.europa.eu/1007>  #	supplementary financing
+				|| ?subject = <http://eurovoc.europa.eu/1014>  #	national financing
+				|| ?subject = <http://eurovoc.europa.eu/1952>  #	financing method
+				|| ?subject = <http://eurovoc.europa.eu/2394>  #	financing plan
+				|| ?subject = <http://eurovoc.europa.eu/2466>  #	financing policy
+				|| ?subject = <http://eurovoc.europa.eu/3240>  #	corporate finance
+				|| ?subject = <http://eurovoc.europa.eu/4226>  #	self-financing
+				|| ?subject = <http://eurovoc.europa.eu/5154>  #	public financing
+				|| ?subject = <http://eurovoc.europa.eu/6025>  #	co-financing
+				|| ?subject = <http://eurovoc.europa.eu/6714>  #	microfinance
+				|| ?subject = <http://eurovoc.europa.eu/1132>  #	investment protection
+				|| ?subject = <http://eurovoc.europa.eu/1488>  #	investment
+				|| ?subject = <http://eurovoc.europa.eu/1489>  #	investment abroad
+				|| ?subject = <http://eurovoc.europa.eu/1490>  #	EU investment
+				|| ?subject = <http://eurovoc.europa.eu/1491>  #	direct investment
+				|| ?subject = <http://eurovoc.europa.eu/1492>  #	foreign investment
+				|| ?subject = <http://eurovoc.europa.eu/1494>  #	international investment
+				|| ?subject = <http://eurovoc.europa.eu/1495>  #	private investment
+				|| ?subject = <http://eurovoc.europa.eu/1496>  #	public investment
+				|| ?subject = <http://eurovoc.europa.eu/1497>  #	regional investment
+				|| ?subject = <http://eurovoc.europa.eu/2463>  #	investment policy
+				|| ?subject = <http://eurovoc.europa.eu/2798>  #	investment project
+				|| ?subject = <http://eurovoc.europa.eu/2805>  #	investment promotion
+				|| ?subject = <http://eurovoc.europa.eu/3148>  #	regulation of investments
+				|| ?subject = <http://eurovoc.europa.eu/3674>  #	investment income
+				|| ?subject = <http://eurovoc.europa.eu/1341>  #	insurance indemnity
+				|| ?subject = <http://eurovoc.europa.eu/165>   #	insurance contract
+				|| ?subject = <http://eurovoc.europa.eu/2623>  #	insurance premium
+				|| ?subject = <http://eurovoc.europa.eu/2906>  #	reinsurance
+				|| ?subject = <http://eurovoc.europa.eu/3151>  #	insurance
+				|| ?subject = <http://eurovoc.europa.eu/3187>  #	export credit insurance
+				|| ?subject = <http://eurovoc.europa.eu/3222>  #	personal accident insurance
+				|| ?subject = <http://eurovoc.europa.eu/3242>  #	property insurance
+				|| ?subject = <http://eurovoc.europa.eu/3243>  #	personal insurance
+				|| ?subject = <http://eurovoc.europa.eu/3244>  #	co-insurance
+				|| ?subject = <http://eurovoc.europa.eu/3274>  #	agricultural insurance
+				|| ?subject = <http://eurovoc.europa.eu/3303>  #	motor vehicle insurance
+				|| ?subject = <http://eurovoc.europa.eu/3373>  #	credit insurance
+				|| ?subject = <http://eurovoc.europa.eu/34>    #	insurance company
+				|| ?subject = <http://eurovoc.europa.eu/3477>  #	indemnity insurance
+				|| ?subject = <http://eurovoc.europa.eu/3541>  #	marine insurance
+				|| ?subject = <http://eurovoc.europa.eu/3567>  #	compulsory insurance
+				|| ?subject = <http://eurovoc.europa.eu/3590>  #	insurance occupation
+				|| ?subject = <http://eurovoc.europa.eu/3599>  #	private insurance
+				|| ?subject = <http://eurovoc.europa.eu/3630>  #	public insurance
+				|| ?subject = <http://eurovoc.europa.eu/3673>  #	third-party insurance
+				|| ?subject = <http://eurovoc.europa.eu/3706>  #	transport insurance
+				|| ?subject = <http://eurovoc.europa.eu/3723>  #	life assurance
+				|| ?subject = <http://eurovoc.europa.eu/3728>  #	insured risk
+				|| ?subject = <http://eurovoc.europa.eu/4166>  #	insurance claim
+				|| ?subject = <http://eurovoc.europa.eu/549>   #	insurance law
+				|| ?subject = <http://eurovoc.europa.eu/1015>  #	excise duty
+				|| ?subject = <http://eurovoc.europa.eu/1321>  #	tax on consumption
+				|| ?subject = <http://eurovoc.europa.eu/4392>  #	VAT rate
+				|| ?subject = <http://eurovoc.europa.eu/4399>  #	export tax
+				|| ?subject = <http://eurovoc.europa.eu/4400>  #	import tax
+				|| ?subject = <http://eurovoc.europa.eu/4401>  #	stamp duty
+				|| ?subject = <http://eurovoc.europa.eu/4585>  #	VAT
+				|| ?subject = <http://eurovoc.europa.eu/1322>  #	wealth tax
+				|| ?subject = <http://eurovoc.europa.eu/1324>  #	capital transfer tax
+				|| ?subject = <http://eurovoc.europa.eu/1325>  #	tax on capital
+				|| ?subject = <http://eurovoc.europa.eu/530>   #	registration tax
+				|| ?subject = <http://eurovoc.europa.eu/1314>  #	property tax
+				|| ?subject = <http://eurovoc.europa.eu/1323>  #	capital gains tax
+				|| ?subject = <http://eurovoc.europa.eu/1326>  #	tax on income
+				|| ?subject = <http://eurovoc.europa.eu/1328>  #	tax on investment income
+				|| ?subject = <http://eurovoc.europa.eu/1331>  #	corporation tax
+				|| ?subject = <http://eurovoc.europa.eu/4406>  #	business tax
+				|| ?subject = <http://eurovoc.europa.eu/504>   #	double taxation
+				|| ?subject = <http://eurovoc.europa.eu/562>   #	international tax law
+				|| ?subject = <http://eurovoc.europa.eu/6342>  #	European tax cooperation
+				|| ?subject = <http://eurovoc.europa.eu/935>   #	tax exemption
+				|| ?subject = <http://eurovoc.europa.eu/1039>  #	price fluctuation
+				|| ?subject = <http://eurovoc.europa.eu/4146>  #	price increase
+				|| ?subject = <http://eurovoc.europa.eu/4623>  #	price reduction
+				|| ?subject = <http://eurovoc.europa.eu/1025>  #	fixing of prices
+				|| ?subject = <http://eurovoc.europa.eu/1072>  #	price formation
+				|| ?subject = <http://eurovoc.europa.eu/1348>  #	price indexing
+				|| ?subject = <http://eurovoc.europa.eu/1354>  #	price index
+				|| ?subject = <http://eurovoc.europa.eu/188>   #	price control
+				|| ?subject = <http://eurovoc.europa.eu/233>   #	publishing of prices
+				|| ?subject = <http://eurovoc.europa.eu/2456>  #	common price policy
+				|| ?subject = <http://eurovoc.europa.eu/2489>  #	prices policy
+				|| ?subject = <http://eurovoc.europa.eu/2675>  #	imposed price
+				|| ?subject = <http://eurovoc.europa.eu/2678>  #	free price
+				|| ?subject = <http://eurovoc.europa.eu/3152>  #	price regulations
+				|| ?subject = <http://eurovoc.europa.eu/2632>  #	prices
+				|| ?subject = <http://eurovoc.europa.eu/2633>  #	bracket price
+				|| ?subject = <http://eurovoc.europa.eu/2660>  #	cost price
+				|| ?subject = <http://eurovoc.europa.eu/2665>  #	commodity price
+				|| ?subject = <http://eurovoc.europa.eu/2666>  #	discriminatory price
+				|| ?subject = <http://eurovoc.europa.eu/2670>  #	price fixed in advance
+				|| ?subject = <http://eurovoc.europa.eu/2673>  #	trigger price
+				|| ?subject = <http://eurovoc.europa.eu/2674>  #	guaranteed price
+				|| ?subject = <http://eurovoc.europa.eu/2679>  #	maximum price
+				|| ?subject = <http://eurovoc.europa.eu/2681>  #	minimum price
+				|| ?subject = <http://eurovoc.europa.eu/2683>  #	average price
+				|| ?subject = <http://eurovoc.europa.eu/2684>  #	preferential price
+				|| ?subject = <http://eurovoc.europa.eu/2685>  #	reduced price
+				|| ?subject = <http://eurovoc.europa.eu/2687>  #	representative price
+				|| ?subject = <http://eurovoc.europa.eu/2689>  #	representative market price
+				|| ?subject = <http://eurovoc.europa.eu/3208>  #	price net of tax
+				|| ?subject = <http://eurovoc.europa.eu/3268>  #	unit price
+				|| ?subject = <http://eurovoc.europa.eu/4329>  #	additional duty
+				|| ?subject = <http://eurovoc.europa.eu/2639>  #	farm prices
+				|| ?subject = <http://eurovoc.europa.eu/2634>  #	export price
+				|| ?subject = <http://eurovoc.europa.eu/2635>  #	import price
+				|| ?subject = <http://eurovoc.europa.eu/2636>  #	consumer price
+				|| ?subject = <http://eurovoc.europa.eu/2638>  #	producer price
+				|| ?subject = <http://eurovoc.europa.eu/2640>  #	food price
+				|| ?subject = <http://eurovoc.europa.eu/2642>  #	purchase price
+				|| ?subject = <http://eurovoc.europa.eu/2648>  #	offer price
+				|| ?subject = <http://eurovoc.europa.eu/2652>  #	retail price
+				|| ?subject = <http://eurovoc.europa.eu/2653>  #	wholesale price
+				|| ?subject = <http://eurovoc.europa.eu/2656>  #	market prices
+				|| ?subject = <http://eurovoc.europa.eu/2664>  #	selling price
+				|| ?subject = <http://eurovoc.europa.eu/2668>  #	world market price
+				|| ?subject = <http://eurovoc.europa.eu/3272> ) . #	price of agricultural produce
+	}
+	graph ?ge { 
+		?exp cdm:expression_belongs_to_work ?work .
+		?exp cdm:expression_uses_language ?lg . 
+		graph ?lgc { ?lg dc:identifier ?langIdentifier .}
+		FILTER(  str( ?langIdentifier)="ENG")
+	}
+	graph ?gm {
+		?manif cdm:manifestation_manifests_expression ?exp .
+		{?manif cdm:manifestation_type ?mtype .}
+		FILTER(  str( ?mtype)="html"|| str( ?mtype)="html_simpl"|| str( ?mtype)="txt"|| str( ?mtype)="xhtml"|| str( ?mtype)="xhtml_simpl"|| str( ?mtype)="xml")
+	}
+}
+GROUP BY ?work
+LIMIT 100000
+OFFSET 1000
