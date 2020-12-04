@@ -2,68 +2,40 @@
 # coding=<utf-8>
 
 
-""" Program to send GET requests to download zip files for the given documents under a CELLAR URI."""
-
+""" Program to send GET requests to the EU CELLAR endpoint and download zip files for the given documents under a CELLAR URI."""
 
 import requests
 import zipfile
 import io
-from collections import defaultdict
 from datetime import datetime
-from file_utils import get_file_list_from_path, text_to_str
-from SPARQLWrapper import SPARQLWrapper, XML, POST, GET, URLENCODED, POSTDIRECTLY, JSON
+from get_cellar_ids import get_cellar_info_from_endpoint, get_cellar_ids_from_json_results, get_cellar_ids_from_csv_file, cellar_ids_to_file
+from regdef_utils.file_utils import get_file_list_from_path, text_to_str, get_subdir_list_from_path, print_list_to_file
 import os
-import threading
 from threading import Thread
-import time
-from tqdm import tqdm
 
 
-def get_cellar_ids_from_file(file_path):
+def check_ids_to_download(id_list):
     """
-    Get the list of cellar IDs from the file in the given file_path.
-    Check whether the id is already present in the directory
-    containing previously downloaded files.
+    Check whether the id in the given CELLAR id_list is already present
+    in the directory containing previously downloaded files.
+    The directory contains subdirectories named with a cellar id.
+    Return a list of cellar_ids absent from the subdirectory names.
 
-    Return a list of cellar_ids absent from the directory.
-
-    :param file_path: file path str
-    :return: set
+    :param id_list: list
+    :return: list
     """
 
-    # Get CELLAR ids of the files already downloaded
-    downloaded_files_dict = defaultdict()
-    downloaded_files_list = get_file_list_from_path("texts/", name='', extension='')
-    downloads = 0
-    for file in downloaded_files_list:
-        downloads += 1
-        cellar_id = file.split('/')[1]
-        downloaded_files_dict[cellar_id] = 0
+    # Get CELLAR ids of the subdirectories containing the files already downloaded
+    downloaded_files_list = get_subdir_list_from_path("texts/")
+    print('ALREADY_DOWNLOADED:', len(downloaded_files_list))
+    print_list_to_file('in_dir_lists/in_dir_' + timestamp + '.txt', downloaded_files_list)
 
-    # Get all the CELLAR ids retrieved with SPARQL query
-    # in the given file_path
+    missing_ids_list = list(set(id_list) - set(downloaded_files_list))
+    print('SET_DIFF:', len(missing_ids_list))
 
-    # Set counter to zero
-    count = 0
+    print_list_to_file('new_cellar_ids/new_cellar_ids_' + timestamp + '.txt', missing_ids_list)
 
-    # Create set (to avoid duplicates) of CELLAR ids to process
-    cellar_ids = set()
-
-    with open(file_path, 'r') as file:
-        file_contents = file.readlines()
-
-        # If the files with that id have not
-        # already been downloaded
-        # and the id was not added to the list
-        # of ids to process (cellar_ids),
-        # add the id to the latter dict.
-        for line in file_contents[1:]:
-            id = line.split(',')[0].split('/')[-1].strip()
-            if id not in downloaded_files_dict.keys() and id not in cellar_ids:
-                count += 1
-                cellar_ids.add(id)
-
-    return cellar_ids
+    return missing_ids_list
 
 
 def rest_get_call(id):
@@ -100,9 +72,8 @@ def process_range(sub_list, i):
     :param i: int
     :return: write to files
     """
-    # Specify folder_path to send results of request
-    # Commented the creation of numbered subfolders
-    folder_path = "texts/" #+ str(i + 1) + "/"
+    # Specify folder_path to store downloaded files
+    folder_path = "cellar_files_" + timestamp + "/"
 
     # Keep track of downloads
     zip_files = []
@@ -121,7 +92,7 @@ def process_range(sub_list, i):
         # Specify sub_folder_path to send results of request
         sub_folder_path = folder_path + id
 
-        # Send Restful GET request
+        # Send Restful GET request for the given id
         response = rest_get_call(id.strip())
 
         # If the response's header contains the string 'Content-Type'
@@ -144,7 +115,7 @@ def process_range(sub_list, i):
                 # Create a directory with the cellar_id name
                 # and write the returned content in a file
                 # with the same name
-                out_file = sub_folder_path + '/' + id + '.xml'
+                out_file = sub_folder_path + '/' + id + '.html'
                 os.makedirs(os.path.dirname(out_file), exist_ok=True)
                 with open(out_file, 'w') as f:
                     f.write(response.text)
@@ -175,29 +146,52 @@ def process_range(sub_list, i):
 
     # Write the list of other (failed) downloads in a file
     with open('failed.txt', 'a') as f:
-        f.write(str(other_downloads))
+        if len(other_downloads) != 0:
+            f.write('Failed downloads ' + timestamp + '\n' + str(other_downloads))
 
 
-if __name__ == '__main__':
+timestamp = str(datetime.now().strftime("%Y%m%d-%H%M%S"))
 
-    # Specify file (path) containing the cellar IDs
-    cellar_ids_file = 'cellar_ids/cellar_ids_2019-06-11.txt'
+# Get SPARQL query from given file
+sparql_query = text_to_str('sparql_queries/financial_domain_sparql_2019-01-07.rq')
 
-    # Create a list of ids from the ids file
-    id_list = list(get_cellar_ids_from_file(cellar_ids_file))
-    print('ID LIST:', len(id_list), id_list)
+# Get CELLAR information from EU SPARQL endpoint
+sparql_query_results = get_cellar_info_from_endpoint(sparql_query)
 
-    # Run multiple threads in parallel to download the files
-    # Adapted from: https://stackoverflow.com/questions/16982569/making-multiple-api-calls-in-parallel-using-python-ipython
-    nthreads = 11
-    threads = []
-    for i in range(nthreads):  # Four times...
-        print(id_list[i::nthreads])
-        sub_list = id_list[i::nthreads]
-        t = Thread(target=process_range, args=(sub_list, i))
-        threads.append(t)
+# Create a list of ids from the SPARQL query results (in JSON format)
+id_list = sorted(get_cellar_ids_from_json_results(sparql_query_results))
+print('ID_LIST:', len(id_list), id_list[:10])
 
-    # start the threads
-    [t.start() for t in threads]
-    # wait for the threads to finish
-    [t.join() for t in threads]
+# # ALTERNATIVELY
+# # If you already have a CSV file with cellar ids,
+# # e.g., copy-pasted from browser results,
+# # specify file (path) containing the cellar IDs
+# # Input format: cellarURIs,lang,mtypes,workTypes,subjects,subject_ids
+# cellar_ids_file = 'sparql_query_results/query_results_2019-01-07.csv'
+#
+# # Create a list of CELLAR ids from the given CSV file
+# id_list_from_file = get_cellar_ids_from_csv_file(cellar_ids_file)
+
+# Output retrieved CELLAR ids list to txt file
+# with each ID on a new line
+# cellar_ids_to_file(id_list)
+
+# Create a list of not-yet-downloaded file ids
+missing_ids_list = check_ids_to_download(id_list)
+print('NEW_FILES_TO_DOWNLOAD:', len(missing_ids_list))#, missing_id_list)
+
+# Run multiple threads in parallel to download the files
+# using the process_range() function
+# Adapted from: https://stackoverflow.com/questions/16982569/making-multiple-api-calls-in-parallel-using-python-ipython
+nthreads = 11
+threads = []
+for i in range(nthreads):  # Four times...
+    # print('ID_LIST:', missing_ids_list[i::nthreads])
+    sub_list = missing_ids_list[i::nthreads]
+    t = Thread(target=process_range, args=(sub_list, i))
+    threads.append(t)
+
+# start the threads
+[t.start() for t in threads]
+# wait for the threads to finish
+[t.join() for t in threads]
