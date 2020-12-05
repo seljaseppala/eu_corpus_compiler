@@ -16,7 +16,7 @@ The SPARQL query in the `sparql_queries/` directory was designed to retrieve EU 
 
 ## Author
 Selja Seppälä
-(selja.seppala@ucc.ie)
+(selja.seppala [at] ucc.ie)
 
 ## Acknowledgements
 These programs were developed as part of "RegDef: A Computer-assisted Definition Authoring and Formalisation System for Legal Experts". The RegDef project is co-funded by a Marie Skłodowska-Curie Career-FIT Fellowship and Enterprise Ireland. Further details on the RegDef project are available at https://seljaseppala.wordpress.com/research/regdef/.
