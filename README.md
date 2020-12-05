@@ -1,6 +1,6 @@
 # EU Regulation Corpus Compiler
 
-The EU Regulation Corpus Compiler is a set of Python programs to retrieve EU regulatory documents from the Eur-Lex portal (https://eur-lex.europa.eu). 
+A set of Python programs to retrieve EU regulatory documents from the Eur-Lex portal (https://eur-lex.europa.eu). 
 
 The program uses a given SPARQL query to retrieve CELLAR records from the EU Sparql endpoint and download the corresponding `.xml` and `.html` files from the EU CELLAR endpoint.
 
