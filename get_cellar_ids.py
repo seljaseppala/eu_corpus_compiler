@@ -9,10 +9,11 @@ It includes a function create a list of CELLAR ids to be used for downloading th
 The program also has a function to return a list of CELLAR ids
 from a CSV file that contains a set of information about each document.
 """
+import os
 
 import pandas as pd
 from datetime import datetime
-from regdef_utils.file_utils import text_to_str, to_json_output_file, print_list_to_file
+from utils.file_utils import text_to_str, to_json_output_file, print_list_to_file
 from SPARQLWrapper import SPARQLWrapper, JSON, POST
 
 
@@ -27,16 +28,7 @@ def get_cellar_info_from_endpoint(sparql_query):
     # sparql_query = "r'" + sparql_query + "'"
     # print('QUERY:', sparql_query)
 
-    endpoint = "http://publications.europa.eu/webapi/rdf/sparql" # 2020-06-12 THIS WORKS!!!
-    # endpoint = "http://publications.europa.eu/webapi/rdf/sparql?default-graph-uri=&query=" # 2020-06-12 THIS WORKS!!!
-    # endpoint = "http://gov.tso.co.uk/tso-gazette-index-wwi/sparql" # 2020-06-12 ERROR: <urlopen error [Errno 8] nodename nor servname provided, or not known>
-    # endpoint = "http://cellar-test.publications.europa.eu/webapi/rdf/sparql" # 2020-06-12 ERROR: <urlopen error [Errno 8] nodename nor servname provided, or not known>
-    # endpoint = "http://abel:8890/sparql" # 2020-06-12 ERROR: <urlopen error [Errno 8] nodename nor servname provided, or not known>
-    # endpoint = "http://data.europa.eu/euodp/sparqlep" # 2020-06-12 ERROR: QueryBadFormed
-    # endpoint = "http://cellar.publications.europa.eu/sparql" # 2020-06-12 ERROR: <urlopen error [Errno 8] nodename nor servname provided, or not known>
-    # endpoint = "https://data.europa.eu/euodp/data/apiodp/package_list" # 2020-06-12 ERROR: EndPointNotFound
-    # endpoint = "https://data.europa.eu/euodp/data/apiodp/package_search" # 2020-06-12 ERROR: EndPointNotFound
-    # endpoint = "https://data.europa.eu/euodp/data/apiodp/package_show" # 2020-06-12 ERROR: EndPointNotFound
+    endpoint = "http://publications.europa.eu/webapi/rdf/sparql" # 2020-06-12 THIS
 
     ## USING SPARQLWrapper
     sparql = SPARQLWrapper(endpoint)
@@ -98,14 +90,16 @@ def query_results_to_json(query_results):
     to_json_output_file('sparql_query_results/query_results_'+timestamp+'.json', query_results)
 
 
-def cellar_ids_to_file(id_list):
+def cellar_ids_to_file(id_list, timestamp):
     """
     Output the list of CELLAR ids to txt file.
     :param id_list: list
     :return: None
     """
+    dir_name = "cellar_ids/"
+    os.makedirs(os.path.dirname(dir_name), exist_ok=True)
     # Usage: print_list_to_file(file_name, data)
-    print_list_to_file('cellar_ids/cellar_ids_' + timestamp + '.txt', id_list)
+    print_list_to_file(dir_name + 'cellar_ids_' + timestamp + '.txt', id_list)
 
 
 if __name__ == '__main__':
@@ -140,4 +134,4 @@ if __name__ == '__main__':
 
     # Output CELLAR ids list to txt file.
     # with each ID on a new line
-    cellar_ids_to_file(id_list)
+    cellar_ids_to_file(id_list, timestamp)
