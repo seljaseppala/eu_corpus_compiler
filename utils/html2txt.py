@@ -97,8 +97,8 @@ def html2txt_str_eu(string):
     all_text = '\n\n'.join(clean_str_list)
 
     # Replace multiple returns with a single one
-    clean_up_return = re.compile(r'\n{2,}')
-    clean_text = re.sub(clean_up_return, r'\n', all_text)
+    clean_up_return = re.compile(r'\n{3,}')
+    clean_text = re.sub(clean_up_return, r'\n\n', all_text)
 
     # print('CLEAN:', clean_text)
     return clean_text
