@@ -9,9 +9,9 @@ import zipfile
 import io
 import os
 from datetime import datetime
-from get_cellar_ids import get_cellar_info_from_endpoint, get_cellar_ids_from_json_results, get_cellar_ids_from_csv_file, cellar_ids_to_file
+from get_cellar_ids import get_cellar_info_from_endpoint, get_cellar_ids_from_json_results
 from get_text_from_cellar_files import get_text
-from file_utils import text_to_str, get_subdir_list_from_path, print_list_to_file
+from utils.file_utils import text_to_str, get_subdir_list_from_path, print_list_to_file
 from threading import Thread
 
 
