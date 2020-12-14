@@ -7,14 +7,15 @@
 import requests
 import zipfile
 import io
+import os
 from datetime import datetime
 from get_cellar_ids import get_cellar_info_from_endpoint, get_cellar_ids_from_json_results, get_cellar_ids_from_csv_file, cellar_ids_to_file
-from regdef_utils.file_utils import get_file_list_from_path, text_to_str, get_subdir_list_from_path, print_list_to_file
-import os
+from get_text_from_cellar_files import get_text
+from file_utils import text_to_str, get_subdir_list_from_path, print_list_to_file
 from threading import Thread
 
 
-def check_ids_to_download(id_list):
+def check_ids_to_download(id_list, dir_to_check):
     """
     Check whether the id in the given CELLAR id_list is already present
     in the directory containing previously downloaded files.
@@ -25,13 +26,14 @@ def check_ids_to_download(id_list):
     :return: list
     """
 
-    # Get CELLAR ids of the subdirectories containing the files already downloaded
-    downloaded_files_list = get_subdir_list_from_path("texts/")
-    print('ALREADY_DOWNLOADED:', len(downloaded_files_list))
+    # Get CELLAR ids in the subdirectories containing the files already downloaded
+    downloaded_files_list = get_subdir_list_from_path(dir_to_check)
+    # print('ALREADY_DOWNLOADED:', len(downloaded_files_list))
     print_list_to_file('in_dir_lists/in_dir_' + timestamp + '.txt', downloaded_files_list)
 
+    # Get list of files that have not yet been downloaded
     missing_ids_list = list(set(id_list) - set(downloaded_files_list))
-    print('SET_DIFF:', len(missing_ids_list))
+    # print('SET_DIFF:', len(missing_ids_list))
 
     print_list_to_file('new_cellar_ids/new_cellar_ids_' + timestamp + '.txt', missing_ids_list)
 
@@ -64,7 +66,7 @@ def download_zip(response, folder_path):
     z.extractall(folder_path)
 
 
-def process_range(sub_list, i):
+def process_range(sub_list, folder_path):
     """
     Process a list of ids to download the corresponding zip files.
 
@@ -72,8 +74,6 @@ def process_range(sub_list, i):
     :param i: int
     :return: write to files
     """
-    # Specify folder_path to store downloaded files
-    folder_path = "cellar_files_" + timestamp + "/"
 
     # Keep track of downloads
     zip_files = []
@@ -124,7 +124,7 @@ def process_range(sub_list, i):
         else:
             count_other += 1
             other_downloads.append(id)
-            print(response.content)
+            # print('NO_CONTENT_TYPE:', response.content)
 
             #  Write the returned content in a file
             # out_file = sub_folder_path + '/' + id + '.xml'
@@ -154,13 +154,15 @@ timestamp = str(datetime.now().strftime("%Y%m%d-%H%M%S"))
 
 # Get SPARQL query from given file
 sparql_query = text_to_str('sparql_queries/financial_domain_sparql_2019-01-07.rq')
+# print('SPARQL_PATH:', sparql_query)
 
 # Get CELLAR information from EU SPARQL endpoint
 sparql_query_results = get_cellar_info_from_endpoint(sparql_query)
 
 # Create a list of ids from the SPARQL query results (in JSON format)
 id_list = sorted(get_cellar_ids_from_json_results(sparql_query_results))
-print('ID_LIST:', len(id_list), id_list[:10])
+# print('ID_LIST:', len(id_list), id_list[:10])
+
 
 # # ALTERNATIVELY
 # # If you already have a CSV file with cellar ids,
@@ -176,22 +178,34 @@ print('ID_LIST:', len(id_list), id_list[:10])
 # with each ID on a new line
 # cellar_ids_to_file(id_list)
 
-# Create a list of not-yet-downloaded file ids
-missing_ids_list = check_ids_to_download(id_list)
-print('NEW_FILES_TO_DOWNLOAD:', len(missing_ids_list))#, missing_id_list)
+
+# Create a list of not-yet-downloaded file ids by comparing the results in id_list with files present in the given directory
+dir_to_check = "texts/"
+missing_ids_list = check_ids_to_download(id_list, dir_to_check)
+# print('NEW_FILES_TO_DOWNLOAD:', len(missing_ids_list))#, missing_id_list)
+
+# Specify folder_path to store downloaded files
+dwnld_folder_path = "cellar_files_" + timestamp + "/"
 
 # Run multiple threads in parallel to download the files
-# using the process_range() function
+# using the process_range(sub_list, dwnld_folder_path) function
 # Adapted from: https://stackoverflow.com/questions/16982569/making-multiple-api-calls-in-parallel-using-python-ipython
 nthreads = 11
 threads = []
 for i in range(nthreads):  # Four times...
     # print('ID_LIST:', missing_ids_list[i::nthreads])
     sub_list = missing_ids_list[i::nthreads]
-    t = Thread(target=process_range, args=(sub_list, i))
+    t = Thread(target=process_range, args=(sub_list, dwnld_folder_path))
     threads.append(t)
 
 # start the threads
 [t.start() for t in threads]
 # wait for the threads to finish
 [t.join() for t in threads]
+
+
+# Generate text files for downloaded XML and HTML files
+# Usage: get_text(input_path, output_dir)
+txt_folder_path = "text_files" + dwnld_folder_path.split('_')[-1]
+# print('TXT_DIR_PATH:', txt_folder_path)
+get_text(dwnld_folder_path, txt_folder_path)
