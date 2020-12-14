@@ -69,8 +69,6 @@ def xml2txt_bs4_eu(file_path: str):
                 # print('NOTE:', note)
                 note.clear()
 
-                # TODO: see if possible to replace footnote with "[X]" and store the footnote with the ref key X in a dict to be output at the end of the text file
-
             # Get text
             raw_str_list = []
             for child in xml_str.contents[0].children:
