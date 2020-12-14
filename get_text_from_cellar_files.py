@@ -16,15 +16,15 @@
     as they only contain metadata.
 
      Note that:
-     - Footnotes in HTML files are currently deleted to avoid them being inserted in the middle of a sentence.
+     - Footnotes in XML files are currently deleted to avoid them being inserted in the middle of a sentence.
      - The text from nested tables in HTML files is repeated.
  """
 import os
 import sys
 from tqdm import tqdm
 from utils.file_utils import get_file_list_from_path
-from html2txt import html2txt_path_eu
-from xml2txt import xml2txt_bs4_eu
+from utils.html2txt import html2txt_path_eu
+from utils.xml2txt import xml2txt_bs4_eu
 
 sys.path.append("..")
 
@@ -39,7 +39,7 @@ def get_text(input_path, output_dir):
     Exclude XML files with ".doc." and ".toc." in their names.
 
      Note that:
-     - Footnotes in HTML files are currently deleted to avoid them being inserted in the middle of a sentence.
+     - Footnotes in XML files are currently deleted to avoid them being inserted in the middle of a sentence.
      - The text from nested tables in HTML files is repeated.
 
     :param input_path: dir path str ending with "/"
