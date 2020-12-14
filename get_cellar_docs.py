@@ -9,7 +9,7 @@ import zipfile
 import io
 import os
 from datetime import datetime
-from get_cellar_ids import get_cellar_info_from_endpoint, get_cellar_ids_from_json_results
+from get_cellar_ids import get_cellar_info_from_endpoint, get_cellar_ids_from_json_results, cellar_ids_to_file
 from get_text_from_cellar_files import get_text
 from utils.file_utils import text_to_str, get_subdir_list_from_path, print_list_to_file
 from threading import Thread
@@ -29,13 +29,16 @@ def check_ids_to_download(id_list, dir_to_check):
     # Get CELLAR ids in the subdirectories containing the files already downloaded
     downloaded_files_list = get_subdir_list_from_path(dir_to_check)
     # print('ALREADY_DOWNLOADED:', len(downloaded_files_list))
-    print_list_to_file('in_dir_lists/in_dir_' + timestamp + '.txt', downloaded_files_list)
+    in_dir_name = 'in_dir_lists/'
+    os.makedirs(os.path.dirname(in_dir_name), exist_ok=True)
+    print_list_to_file(in_dir_name + 'in_dir_' + timestamp + '.txt', downloaded_files_list)
 
     # Get list of files that have not yet been downloaded
     missing_ids_list = list(set(id_list) - set(downloaded_files_list))
-    # print('SET_DIFF:', len(missing_ids_list))
-
-    print_list_to_file('new_cellar_ids/new_cellar_ids_' + timestamp + '.txt', missing_ids_list)
+    #print('SET_DIFF:', len(missing_ids_list))
+    new_ids_dir_name = 'new_cellar_ids/'
+    os.makedirs(os.path.dirname(new_ids_dir_name), exist_ok=True)
+    print_list_to_file(new_ids_dir_name + 'new_cellar_ids_' + timestamp + '.txt', missing_ids_list)
 
     return missing_ids_list
 
@@ -71,7 +74,7 @@ def process_range(sub_list, folder_path):
     Process a list of ids to download the corresponding zip files.
 
     :param sub_list: list of str
-    :param i: int
+    :param folder_path: str
     :return: write to files
     """
 
@@ -176,16 +179,19 @@ id_list = sorted(get_cellar_ids_from_json_results(sparql_query_results))
 
 # Output retrieved CELLAR ids list to txt file
 # with each ID on a new line
-# cellar_ids_to_file(id_list)
+cellar_ids_to_file(id_list, timestamp)
 
 
 # Create a list of not-yet-downloaded file ids by comparing the results in id_list with files present in the given directory
-dir_to_check = "texts/"
-missing_ids_list = check_ids_to_download(id_list, dir_to_check)
-# print('NEW_FILES_TO_DOWNLOAD:', len(missing_ids_list))#, missing_id_list)
+# dir_to_check = None
+dir_to_check = "cellar_files_20201214-165041/"
+# dir_to_check = "dir_with_previously_downloaded_files/"
+if dir_to_check:
+    id_list = check_ids_to_download(id_list, dir_to_check)
+    # print('NEW_FILES_TO_DOWNLOAD:', len(id_list))
 
-# Specify folder_path to store downloaded files
-dwnld_folder_path = "cellar_files_" + timestamp + "/"
+# Specify folder path to store downloaded files
+dwnld_folder_path = "data/cellar_files_" + timestamp + "/"
 
 # Run multiple threads in parallel to download the files
 # using the process_range(sub_list, dwnld_folder_path) function
@@ -193,8 +199,8 @@ dwnld_folder_path = "cellar_files_" + timestamp + "/"
 nthreads = 11
 threads = []
 for i in range(nthreads):  # Four times...
-    # print('ID_LIST:', missing_ids_list[i::nthreads])
-    sub_list = missing_ids_list[i::nthreads]
+    # print('ID_LIST:', id_list[i::nthreads])
+    sub_list = id_list[i::nthreads]
     t = Thread(target=process_range, args=(sub_list, dwnld_folder_path))
     threads.append(t)
 
@@ -206,6 +212,6 @@ for i in range(nthreads):  # Four times...
 
 # Generate text files for downloaded XML and HTML files
 # Usage: get_text(input_path, output_dir)
-txt_folder_path = "text_files" + dwnld_folder_path.split('_')[-1]
+txt_folder_path = "data/text_files_" + dwnld_folder_path.split('_')[-1]
 # print('TXT_DIR_PATH:', txt_folder_path)
 get_text(dwnld_folder_path, txt_folder_path)
