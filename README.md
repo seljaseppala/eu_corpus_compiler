@@ -33,7 +33,13 @@ The SPARQL query in the `sparql_queries/` directory was designed to retrieve EU 
 
  ### About the text files
 - When extracting the text from XML files, footnotes are currently removed to avoid them being inserted in the middle of a sentence in the text file.
-- The text from nested tables in HTML files is repeated.
+- The text from nested tables in HTML files is repeated, as shown in this example.
+```
+Portugal — Região Autónoma da Madeira (Autonomous Region of Madeira) — Região Autónoma dos Açores (Autonomous Region of Azores) — Municipalities
+— Região Autónoma da Madeira (Autonomous Region of Madeira)
+— Região Autónoma dos Açores (Autonomous Region of Azores)
+— Municipalities
+```
 
  ### About the number of CELLAR ids and downloaded files
 - The number of CELLAR ids to be downloaded might be different from the number of files actually downloaded due to the fact that a single CELLAR id can correspond to multiple `.xml` files.
