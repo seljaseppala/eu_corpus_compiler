@@ -9,9 +9,10 @@ import zipfile
 import io
 import os
 from datetime import datetime
-from get_cellar_ids import get_cellar_info_from_endpoint, get_cellar_ids_from_json_results, cellar_ids_to_file
+from get_cellar_ids import get_cellar_info_from_endpoint, get_cellar_ids_from_json_results, cellar_ids_to_file, \
+    get_cellar_ids_from_csv_file
 from get_text_from_cellar_files import get_text
-from utils.file_utils import text_to_str, get_subdir_list_from_path, print_list_to_file
+from utils.file_utils import text_to_str, get_subdir_list_from_path, print_list_to_file, to_json_output_file
 from threading import Thread
 
 
@@ -29,16 +30,16 @@ def check_ids_to_download(id_list, dir_to_check):
     # Get CELLAR ids in the subdirectories containing the files already downloaded
     downloaded_files_list = get_subdir_list_from_path(dir_to_check)
     # print('ALREADY_DOWNLOADED:', len(downloaded_files_list))
-    in_dir_name = 'in_dir_lists/'
+    in_dir_name = 'id_logs/in_dir_lists/'
     os.makedirs(os.path.dirname(in_dir_name), exist_ok=True)
     print_list_to_file(in_dir_name + 'in_dir_' + timestamp + '.txt', downloaded_files_list)
 
     # Get list of files that have not yet been downloaded
     missing_ids_list = list(set(id_list) - set(downloaded_files_list))
     #print('SET_DIFF:', len(missing_ids_list))
-    new_ids_dir_name = 'new_cellar_ids/'
+    new_ids_dir_name = 'id_logs/cellar_ids/'
     os.makedirs(os.path.dirname(new_ids_dir_name), exist_ok=True)
-    print_list_to_file(new_ids_dir_name + 'new_cellar_ids_' + timestamp + '.txt', missing_ids_list)
+    print_list_to_file(new_ids_dir_name + 'cellar_ids_' + timestamp + '.txt', missing_ids_list)
 
     return missing_ids_list
 
@@ -148,34 +149,42 @@ def process_range(sub_list, folder_path):
     # print(log_text)
 
     # Write the list of other (failed) downloads in a file
-    with open('failed.txt', 'a') as f:
+    id_logs_path = 'id_logs/failed_' + timestamp + '.txt'
+    os.makedirs(os.path.dirname(id_logs_path), exist_ok=True)
+    with open(id_logs_path, 'w+') as f:
         if len(other_downloads) != 0:
             f.write('Failed downloads ' + timestamp + '\n' + str(other_downloads))
 
-
+# Program starts here
+# ===================
 timestamp = str(datetime.now().strftime("%Y%m%d-%H%M%S"))
 
 # Get SPARQL query from given file
-sparql_query = text_to_str('sparql_queries/financial_domain_sparql_2019-01-07.rq')
+sparql_query = text_to_str('queries/sparql_queries/financial_domain_sparql_2019-01-07.rq')
 # print('SPARQL_PATH:', sparql_query)
 
-# Get CELLAR information from EU SPARQL endpoint
+# Get CELLAR information from EU SPARQL endpoint (in JSON format)
 sparql_query_results = get_cellar_info_from_endpoint(sparql_query)
+
+# Output SPARQL results to file
+sparql_query_results_dir = "queries/sparql_query_results/"
+os.makedirs(os.path.dirname(sparql_query_results_dir), exist_ok=True)
+sparql_query_results_file = sparql_query_results_dir + "query_results_" + timestamp + ".json"
+to_json_output_file(sparql_query_results_file, sparql_query_results)
 
 # Create a list of ids from the SPARQL query results (in JSON format)
 id_list = sorted(get_cellar_ids_from_json_results(sparql_query_results))
 # print('ID_LIST:', len(id_list), id_list[:10])
-
 
 # # ALTERNATIVELY
 # # If you already have a CSV file with cellar ids,
 # # e.g., copy-pasted from browser results,
 # # specify file (path) containing the cellar IDs
 # # Input format: cellarURIs,lang,mtypes,workTypes,subjects,subject_ids
-# cellar_ids_file = 'sparql_query_results/query_results_2019-01-07.csv'
-#
+# cellar_ids_file = 'queries/sparql_query_results/query_results_2019-01-07.csv'
+# #
 # # Create a list of CELLAR ids from the given CSV file
-# id_list_from_file = get_cellar_ids_from_csv_file(cellar_ids_file)
+# id_list = get_cellar_ids_from_csv_file(cellar_ids_file)
 
 # Output retrieved CELLAR ids list to txt file
 # with each ID on a new line
@@ -184,9 +193,9 @@ cellar_ids_to_file(id_list, timestamp)
 
 # Create a list of not-yet-downloaded file ids by comparing the results in id_list with files present in the given directory
 # dir_to_check = None
-dir_to_check = "cellar_files_20201214-165041/"
+dir_to_check = "data/cellar_files_20201214-165041/"
 # dir_to_check = "dir_with_previously_downloaded_files/"
-if dir_to_check:
+if dir_to_check and os.path.exists(dir_to_check):
     id_list = check_ids_to_download(id_list, dir_to_check)
     # print('NEW_FILES_TO_DOWNLOAD:', len(id_list))
 
@@ -211,7 +220,9 @@ for i in range(nthreads):  # Four times...
 
 
 # Generate text files for downloaded XML and HTML files
-# Usage: get_text(input_path, output_dir)
+# Set replace_existing to True to replace existing text files.
+# To process only new files, set replace_existing to False (default).
+# Usage: get_text(input_path, output_dir, replace_existing=False)
 txt_folder_path = "data/text_files_" + dwnld_folder_path.split('_')[-1]
 # print('TXT_DIR_PATH:', txt_folder_path)
-get_text(dwnld_folder_path, txt_folder_path)
+get_text(dwnld_folder_path, txt_folder_path, replace_existing=False)
