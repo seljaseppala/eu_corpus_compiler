@@ -19,7 +19,7 @@ The SPARQL query in the `sparql_queries/` directory was designed to retrieve EU 
 
 ## Default data directories
 - The information retrieved from the SPARQL endpoint is stored by default under `sparql_query_results/query_results_<date>-<time>.json` (e.g., `sparql_query_results/query_results_query_results_20201203-145051.json`).
-- The list of files already downloaded is stored by default under `in_dir_lists/in_dir_<date>-<time>.txt` (e.g., `in_dir_lists/in_dir_20201214-155143.txt).
+- The list of files already downloaded is stored by default under `in_dir_lists/in_dir_<date>-<time>.txt` (e.g., `in_dir_lists/in_dir_20201214-155143.txt`).
 - The list of new CELLAR ids to send to the EU CELLAR server is stored by default under `new_cellar_ids/new_cellar_ids_<date>-<time>.txt` (e.g., `new_cellar_ids/new_cellar_ids_20201214-155143.txt`).
 - The retrieved `.xml` and `.html` files are downloaded to a new directory named by default `data/cellar_files_<date>-<time>/<CELLAR_ID>/` (e.g., `data/cellar_files_20201214-155143/39ca1c1c-3091-11eb-b27b-01aa75ed71a1/`).
 - The generated `.txt` files are stored by default under `data/text_files_<download_date>-<download_time>.txt` (e.g., `data/text_files_20201214-155143/`).
