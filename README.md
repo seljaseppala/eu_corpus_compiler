@@ -40,6 +40,7 @@ Portugal — Região Autónoma da Madeira (Autonomous Region of Madeira) — Reg
 — Região Autónoma dos Açores (Autonomous Region of Azores)
 — Municipalities
 ```
+- Some CELLAR ids point to HTML files that contain URIs instead of content. This linked contents are currently not retrieved (e.g., http://publications.europa.eu/resource/cellar/d4661dab-51b2-11e7-a5ca-01aa75ed71a1)
 
  ### About the number of CELLAR ids and downloaded files
 - The number of CELLAR ids to be downloaded might be different from the number of files actually downloaded due to the fact that a single CELLAR id can correspond to multiple `.xml` files.
