@@ -53,7 +53,7 @@ Selja Seppälä
 (selja.seppala [at] ucc.ie)
 
 ## Acknowledgements
-These programs were developed as part of "RegDef: A Computer-assisted Definition Authoring and Formalisation System for Legal Experts". The RegDef project is co-funded by the Marie Skłodowska-Curie Career-FIT Fellowship scheme and Enterprise Ireland. Further details on the RegDef project are available at https://seljaseppala.wordpress.com/research/regdef/.
+This program was developed as part of "RegDef: A Computer-assisted Definition Authoring and Formalisation System for Legal Experts". The RegDef project is co-funded by the Marie Skłodowska-Curie Career-FIT Fellowship scheme and Enterprise Ireland. Further details on the RegDef project are available at https://seljaseppala.wordpress.com/research/regdef/.
 
 Career-FIT has received funding from the European Union’s Horizon2020 research and innovation programme under the Marie Skłodowska-Curie grant agreement No. 713654
 
