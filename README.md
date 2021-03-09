@@ -1,5 +1,7 @@
 # EU Regulation Corpus Compiler
 
+[![DOI](https://zenodo.org/badge/202197619.svg)](https://zenodo.org/badge/latestdoi/202197619)
+
 A pipeline of Python programs to retrieve EU regulatory documents from the Eur-Lex portal (https://eur-lex.europa.eu). 
 
 The program starts by sending a given SPARQL query (defining, for example, the types, the language, and the domain of the documents to retrieve) to the EU Sparql endpoint to retrieve CELLAR records. The CELLAR ids are then collected and sent to the EU CELLAR endpoint to download the corresponding `.xml` and `.html` files. The program can also check which files have already been downloaded so as to download only new files. Finally, the text of the `.xml` and `.html` files is extracted, cleaned up, and output in new text files.
